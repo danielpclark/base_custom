@@ -11,12 +11,11 @@ fn it_works_with_binary() {
   assert_eq!(base2.gen(0b111), "111");
 }
 
-
 #[test]
 fn it_works_with_trinary() {
-	let base3 = BaseCustom::new("ABC".chars().collect());
-	assert_eq!(base3.decimal("ABC"), 5);
-	assert_eq!(base3.gen(123), "BBBCA");
+  let base3 = BaseCustom::new("ABC".chars().collect());
+  assert_eq!(base3.decimal("ABC"), 5);
+  assert_eq!(base3.gen(123), "BBBCA");
 }  
 
 #[test]
@@ -25,6 +24,7 @@ fn it_works_with_decimal() {
   assert_eq!(base10.gen(123), "123");
   assert_eq!(base10.decimal("123"), 123);
 }
+
 //  it "delim" do
 //    base = BaseCustom.new(["a", "bb", "ccc", "dddd"], ' ')
 //    base.base( 20 ).should eq("bb bb a ")
@@ -48,7 +48,7 @@ fn it_works_with_decimal() {
 //    baseMND.base(12).should eq("bb:bb:aa:")
 //    baseMND.base("bb:bb:aa:").should eq(12)
 //  end
-//
+
 #[test]
 fn it_works_with_special_characters() {
   let base_sc = BaseCustom::new("\n01\t".chars().collect());

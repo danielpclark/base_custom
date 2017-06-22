@@ -72,7 +72,7 @@ impl BaseCustom<String> {
     BaseCustom::<String> {
       primitives: strings.iter().map(|s| format!("{}", s)).collect(),
       primitives_hash: mapped,
-      base: chars.len() as u32,
+      base: strings.len() as u32,
       delim: delim,
     }
   }
@@ -96,7 +96,10 @@ impl BaseCustom<String> {
     where S: Into<String> {
     let input_val = input_val.into();
     let strings: Vec<String> = match self.delim {
-      Some(c) => input_val.split(c).filter(|c| !(c.is_empty() || c.chars().next() == self.delim)).map(|c| format!("{}", c)).collect(),
+      Some(c) => input_val.split(c).
+        filter(|c| !(c.is_empty() || c.chars().next() == self.delim)).
+        map(|c| format!("{}", c)).
+        collect(),
       None => input_val.chars().map(|c| format!("{}", c)).collect(),
     };
     let rchars = strings.iter().rev().enumerate();

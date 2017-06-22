@@ -61,23 +61,19 @@ fn it_works_with_a_delimiter_decimal() {
   assert_eq!(base.decimal( "bb bb a " ), 20);
 }
 
-//  it "delim music" do
-//    baseMusic = BaseCustom.new(%w[A A# B C C# D D# E F F# G G#], ' ')
-//    baseMusic.base( (Math::PI * 100000000).to_i ).should eq("F F# B D# D A# D# F# ")
-//    baseMusic.base( "F F# B D# D A# D# F# " ).should eq((Math::PI * 100000000).to_i)
-//  end
-//  
-//  it "multi with delim" do
-//    baseMND = BaseCustom.new(%w(aa bb cc), ':')
-//    baseMND.base(12).should eq("bb:bb:aa:")
-//    baseMND.base("bb:bb:aa:").should eq(12)
-//  end
-//  
-//  it "multi in string with delim" do
-//    baseMND = BaseCustom.new("aa:bb:cc", ':')
-//    baseMND.base(12).should eq("bb:bb:aa:")
-//    baseMND.base("bb:bb:aa:").should eq(12)
-//  end
+#[test]
+fn it_works_with_music_and_a_delimiter() {
+  let base_music = BaseCustom::<String>::new("A A# B C C# D D# E F F# G G#", Some(' '));
+  assert_eq!(base_music.decimal("F F# B D# D A# D# F# "), 314159265);
+  assert_eq!(base_music.gen(314159265), "F F# B D# D A# D# F# ");
+}
+
+#[test]
+fn it_works_with_non_space_delimiter() {
+  let base_mnd = BaseCustom::<String>::new("aa:bb:cc", Some(':'));
+  assert_eq!(base_mnd.gen(12), "bb:bb:aa:");
+  assert_eq!(base_mnd.decimal("bb:bb:aa:"), 12);
+}
 
 #[test]
 fn it_works_with_special_characters() {

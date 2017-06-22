@@ -3,6 +3,7 @@ name = "base_custom"
 version = "0.1.1"
 authors = ["Daniel P. Clark <6ftdan@gmail.com>"]
 description = "Use any characters as your own numeric base and convert to and from decimal."
+documentation = "http://danielpclark.github.io/base_custom/index.html"
 homepage = "https://github.com/danielpclark/base_custom"
 repository = "https://github.com/danielpclark/base_custom"
 license = "MIT OR Apache-2.0"

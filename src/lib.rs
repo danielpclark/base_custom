@@ -94,6 +94,7 @@ impl BaseCustom<String> {
     let mut result = String::new();
     loop {
       if number == 0 { break };
+      if self.delim != None { result.insert(0, self.delim.unwrap()) };
       result.insert_str(0, &self.primitives[(number % self.base) as usize][..]);
       number = (number/self.base) as u32;
     };
@@ -105,13 +106,19 @@ impl BaseCustom<String> {
     let mut i = 0;
     let mut i_out = 0;
     let input_val = input_val.into();
-    let mut rchars = input_val.chars().rev();
+    let strings: Vec<String> = match self.delim {
+      Some(c) => input_val.split(c).map(|c| format!("{}", c)).collect(),
+      None => input_val.chars().map(|c| format!("{}", c)).collect(),
+    };
+    let mut rchars = strings.iter().rev();
     loop {
       match rchars.next() {
         Some(chr) => {
-          let s = format!("{}", chr);
+          if self.delim != None {
+            if chr == &format!("{}", self.delim.unwrap()) { continue }
+          }
           let place = self.base.pow(i) as u32;
-          i_out += self.primitives_hash[&s] * place;
+          i_out += self.primitives_hash[&chr[..]] * place;
           i += 1;
         },
         None => break,

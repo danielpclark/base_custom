@@ -50,9 +50,14 @@ fn it_works_with_decimal_for_string() {
 }
 
 #[test]
-fn it_works_with_a_delimiter() {
+fn it_works_with_a_delimiter_gen() {
   let base = BaseCustom::<String>::new("a bb ccc dddd", Some(' '));
   assert_eq!(base.gen( 20 ), "bb bb a ");
+}
+
+#[test]
+fn it_works_with_a_delimiter_decimal() {
+  let base = BaseCustom::<String>::new("a bb ccc dddd", Some(' '));
   assert_eq!(base.decimal( "bb bb a " ), 20);
 }
 

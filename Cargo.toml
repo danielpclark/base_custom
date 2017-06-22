@@ -1,4 +1,11 @@
 [package]
 name = "base_custom"
-version = "0.0.1"
+version = "0.1.0"
 authors = ["Daniel P. Clark <6ftdan@gmail.com>"]
+description = "Use any characters as your own numeric base and convert to and from decimal."
+homepage = "https://github.com/danielpclark/base_custom"
+repository = "https://github.com/danielpclark/base_custom"
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+keywords = ["numeric","base","conversion","decimal"]
+categories = ["cryptography", "data-structures"]

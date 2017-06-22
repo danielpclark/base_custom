@@ -1,9 +1,11 @@
+// Copyright 2017 Daniel P. Clark & base_custom Developers
+// 
+// Licensed under the Apache License, Version 2.0, <LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
+// http://opensource.org/licenses/MIT>, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 use std::collections::HashMap;
 use std::string::String;
-// use std::cmp::Eq;
-// use std::hash::Hash;
-// use std::clone::Clone;
-// use std::fmt::Display;
 
 pub struct BaseCustom<T> {
   primitives: Vec<T>,
@@ -43,9 +45,8 @@ impl BaseCustom<char> {
   pub fn decimal<S>(&self, input_val: S) -> u32
     where S: Into<String> {
     let input_val = input_val.into();
-    let rchars = input_val.chars().rev().enumerate();
 
-    rchars.fold(0, |sum, (i, chr)|
+    input_val.chars().rev().enumerate().fold(0, |sum, (i, chr)|
       sum + self.primitives_hash[&chr] * self.base.pow(i as u32)
     )
   }
@@ -63,9 +64,7 @@ impl BaseCustom<String> {
     let mut enumerator = strings.iter().enumerate();
     loop {
       match enumerator.next() {
-        Some((i,c)) => {
-          mapped.insert(format!("{}", c), i as u32)
-        },
+        Some((i,c)) => mapped.insert(format!("{}", c), i as u32),
         None => break,
       };
     }
@@ -96,15 +95,11 @@ impl BaseCustom<String> {
     where S: Into<String> {
     let input_val = input_val.into();
     let strings: Vec<String> = match self.delim {
-      Some(c) => input_val.split(c).
-        filter(|c| !(c.is_empty() || c.chars().next() == self.delim)).
-        map(|c| format!("{}", c)).
-        collect(),
+      Some(c) => input_val.split(c).filter(|c| !c.is_empty()).map(|c| format!("{}", c)).collect(),
       None => input_val.chars().map(|c| format!("{}", c)).collect(),
     };
-    let rchars = strings.iter().rev().enumerate();
 
-    rchars.fold(0, |sum, (i, chr)|
+    strings.iter().rev().enumerate().fold(0, |sum, (i, chr)|
       sum + self.primitives_hash[&chr[..]] * self.base.pow(i as u32)
     )
   }

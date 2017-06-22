@@ -73,6 +73,7 @@ fn it_works_with_non_space_delimiter() {
   let base_mnd = BaseCustom::<String>::new("aa:bb:cc", Some(':'));
   assert_eq!(base_mnd.gen(12), "bb:bb:aa:");
   assert_eq!(base_mnd.decimal("bb:bb:aa:"), 12);
+  assert_eq!(base_mnd.decimal("bb::bb::aa"), 12);
 }
 
 #[test]

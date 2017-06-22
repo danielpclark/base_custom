@@ -3,7 +3,13 @@
 [![crates.io version](https://img.shields.io/crates/v/base_custom.svg)](https://crates.io/crates/base_custom)
 [![License](https://img.shields.io/crates/l/base_custom.svg)]()
 
-Use any characters as your own numeric base and convert to and from decimal.
+Use any characters as your own numeric base and convert to and from decimal.  This can be taken advantage of in various ways:
+
+* Mathematics: number conversion
+* Brute force sequencing
+* Rolling ciphers
+* Moderate information concealment
+* Other potential uses such as deriving music or art from numbers
 
 _There is also a Ruby and Crystal implementation of this which this was based off of._
 

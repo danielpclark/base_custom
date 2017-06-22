@@ -9,3 +9,6 @@ license = "MIT OR Apache-2.0"
 readme = "README.md"
 keywords = ["numeric","base","conversion","decimal"]
 categories = ["cryptography", "data-structures"]
+
+[badges]
+travis-ci = { repository = "danielpclark/base_custom", branch = "master" }

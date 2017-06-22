@@ -12,7 +12,7 @@ _There is also a Ruby and Crystal implementation of this which this was based of
 Add the following to your Cargo.toml file
 ```toml
 [dependencies]
-base_custom = "0.1.0"
+base_custom = "^0.1"
 ```
 
 To include it for usage add

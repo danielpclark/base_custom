@@ -42,21 +42,12 @@ impl BaseCustom<char> {
 
   pub fn decimal<S>(&self, input_val: S) -> u32
     where S: Into<String> {
-    let mut i = 0;
-    let mut i_out = 0;
     let input_val = input_val.into();
-    let mut rchars = input_val.chars().rev();
-    loop {
-      match rchars.next() {
-        Some(chr) => {
-          let place = self.base.pow(i) as u32;
-          i_out += self.primitives_hash[&chr] * place;
-          i += 1;
-        },
-        None => break,
-      }
-    }
-    i_out
+    let rchars = input_val.chars().rev().enumerate();
+
+    rchars.fold(0, |sum, (i, chr)|
+      sum + self.primitives_hash[&chr] * self.base.pow(i as u32)
+    )
   }
 }
 
@@ -103,27 +94,15 @@ impl BaseCustom<String> {
 
   pub fn decimal<S>(&self, input_val: S) -> u32
     where S: Into<String> {
-    let mut i = 0;
-    let mut i_out = 0;
     let input_val = input_val.into();
     let strings: Vec<String> = match self.delim {
-      Some(c) => input_val.split(c).map(|c| format!("{}", c)).collect(),
+      Some(c) => input_val.split(c).filter(|c| !(c.is_empty() || c.chars().next() == self.delim)).map(|c| format!("{}", c)).collect(),
       None => input_val.chars().map(|c| format!("{}", c)).collect(),
     };
-    let mut rchars = strings.iter().rev();
-    loop {
-      match rchars.next() {
-        Some(chr) => {
-          if self.delim != None {
-            if chr == &format!("{}", self.delim.unwrap()) { continue }
-          }
-          let place = self.base.pow(i) as u32;
-          i_out += self.primitives_hash[&chr[..]] * place;
-          i += 1;
-        },
-        None => break,
-      }
-    }
-    i_out
+    let rchars = strings.iter().rev().enumerate();
+
+    rchars.fold(0, |sum, (i, chr)|
+      sum + self.primitives_hash[&chr[..]] * self.base.pow(i as u32)
+    )
   }
 }

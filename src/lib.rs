@@ -44,6 +44,7 @@
 use std::collections::HashMap;
 use std::string::String;
 use std::fmt;
+use std::ops::Range;
 
 /// The BaseCustom struct holds the information to perform number conversions
 /// via the `gen` and `decimal` methods.
@@ -181,6 +182,17 @@ impl BaseCustom<char> {
     } else {
       None
     }
+  }
+
+  /// Create a custom numeric base from an ascii range of ordinal values
+  pub fn from_ordinal_range(range: Range<u32>) -> BaseCustom<char> {
+    let min = std::cmp::max(32, range.start);
+    let max = std::cmp::min(127, range.end);
+    let mut chars: Vec<char> = Vec::with_capacity(std::cmp::min(range.len(), 95));
+    for chr in min..max {
+      chars.push(std::char::from_u32(chr).unwrap());
+    }
+    BaseCustom::<char>::new(chars)
   }
 }
 

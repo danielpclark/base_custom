@@ -202,6 +202,7 @@ impl BaseCustom<String> {
       Some(c) => chars.split(c).map(|c| format!("{}", c)).collect(),
       None => chars.chars().map(|c| format!("{}", c)).collect(),
     };
+    if strings.iter().count() < 2 { panic!("Too few numeric units! Provide two or more.") }
     let mut enumerator = strings.iter().enumerate();
     loop {
       match enumerator.next() {

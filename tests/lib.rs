@@ -3,10 +3,15 @@ use base_custom::BaseCustom;
 
 #[test]
 #[should_panic(expected = "Too few numeric units! Provide two or more.")]
-fn it_must_have_minimal_characters() {
+fn it_must_have_minimal_characters_for_char() {
   BaseCustom::<char>::new("".chars().collect());
-  BaseCustom::<String>::new("", None);
   BaseCustom::<char>::new("0".chars().collect());
+}
+
+#[test]
+#[should_panic(expected = "Too few numeric units! Provide two or more.")]
+fn it_must_have_minimal_characters_for_string() {
+  BaseCustom::<String>::new("", None);
   BaseCustom::<String>::new("0", None);
 }
 

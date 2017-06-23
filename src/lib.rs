@@ -93,6 +93,7 @@ impl BaseCustom<char> {
   /// `new` for `BaseCustom<char>` requires a `Vec<char>` as its parameters and units
   /// for measuring the custom numeric base will only be one character long each.
   pub fn new(chars: Vec<char>) -> BaseCustom<char> {
+    if chars.iter().count() < 2 { panic!("Too few numeric units! Provide two or more.") }
     let mut mapped = HashMap::with_capacity(chars.iter().count());
     for (i,c) in chars.iter().enumerate() {
       mapped.insert(c.clone(), i as u32);
@@ -158,6 +159,28 @@ impl BaseCustom<char> {
     input_val.chars().rev().enumerate().fold(0, |sum, (i, chr)|
       sum + self.primitives_hash[&chr] * self.base.pow(i as u32)
     )
+  }
+
+  /// Returns the zero value of your custom base
+  pub fn zero(&self) -> &char {
+    &self.primitives[0]
+  }
+
+  /// Returns the one value of your custom base
+  pub fn one(&self) -> &char {
+    &self.primitives[1]
+  }
+
+  /// Returns the nth value of your custom base
+  /// 
+  /// Like most indexing operations, the count starts from zero, so nth(0) returns the first value,
+  /// nth(1) the second, and so on.
+  pub fn nth(&self, pos: usize) -> Option<&char> {
+    if pos > 0 && pos < self.base as usize {
+      Some(&self.primitives[pos])
+    } else {
+      None
+    }
   }
 }
 
@@ -251,5 +274,27 @@ impl BaseCustom<String> {
     strings.iter().rev().enumerate().fold(0, |sum, (i, chr)|
       sum + self.primitives_hash[&chr[..]] * self.base.pow(i as u32)
     )
+  }
+
+  /// Returns the zero value of your custom base
+  pub fn zero(&self) -> &str {
+    &self.primitives[0]
+  }
+
+  /// Returns the one value of your custom base
+  pub fn one(&self) -> &str {
+    &self.primitives[1]
+  }
+
+  /// Returns the nth value of your custom base
+  /// 
+  /// Like most indexing operations, the count starts from zero, so nth(0) returns the first value,
+  /// nth(1) the second, and so on.
+  pub fn nth(&self, pos: usize) -> Option<&str> {
+    if pos > 0 && pos < self.base as usize {
+      Some(&self.primitives[pos])
+    } else {
+      None
+    }
   }
 }

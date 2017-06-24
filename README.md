@@ -35,8 +35,8 @@ to your file.
 ```rust
 // Binary with no delimiter
 let base2 = BaseCustom::<char>::new("01".chars().collect());
-assert_eq!(base2.decimal("00001"), 1_u32);
-assert_eq!(base2.decimal("100110101"), 309_u32);
+assert_eq!(base2.decimal("00001"), 1_u64);
+assert_eq!(base2.decimal("100110101"), 309_u64);
 assert_eq!(base2.gen(340), "101010100");
 assert_eq!(base2.gen(0xF45), "111101000101");
 assert_eq!(base2.gen(0b111), "111");

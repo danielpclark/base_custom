@@ -52,6 +52,7 @@ use std::ops::Range;
 /// A new instance of BaseCustom can be created with either
 ///
 /// * `BaseCustom::<char>::new(Vec<char>)`
+/// * `BaseCustom::<char>::from_ordinal_range(Range)`
 /// * `BaseCustom::<String>::new(String, Option<char>)`
 ///
 /// _If you are going to provide a delimiter you need to use the `<String>` implementation.

@@ -60,6 +60,13 @@ fn it_works_with_binary_for_char_from_ordinal_range() {
 }
 
 #[test]
+fn it_can_convert_base_10_on_u64_max() {
+  let base10 = BaseCustom::<char>::from_ordinal_range(48..58);
+  assert_eq!(base10.gen(18446744073709551615), "18446744073709551615");
+  assert_eq!(base10.decimal("18446744073709551615"), 18446744073709551615);
+}
+
+#[test]
 fn it_works_with_binary_for_char_from_min_of_ordinal_range() {
   let base2 = BaseCustom::<char>::from_ordinal_range(0..34);
   println!("{}", base2.gen(3));

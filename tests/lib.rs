@@ -67,6 +67,14 @@ fn it_can_convert_base_10_on_u64_max() {
 }
 
 #[test]
+fn it_can_convert_base_10_on_u64_max_with_delimiter() {
+  let b10stringdelim = BaseCustom::<String>::new(".0.1.2.3.4.5.6.7.8.9..", Some('.'));
+  assert_eq!(b10stringdelim.gen(184), "1.8.4.");
+  assert_eq!(b10stringdelim.gen(18446744073709551615), "1.8.4.4.6.7.4.4.0.7.3.7.0.9.5.5.1.6.1.5.");
+  assert_eq!(b10stringdelim.decimal("1.8.4.4.6.7.4.4.0.7.3.7.0.9.5.5.1.6.1.5"), 18446744073709551615);
+}
+
+#[test]
 fn it_works_with_binary_for_char_from_min_of_ordinal_range() {
   let base2 = BaseCustom::<char>::from_ordinal_range(0..34);
   println!("{}", base2.gen(3));

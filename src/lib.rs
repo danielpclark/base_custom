@@ -213,8 +213,8 @@ impl BaseCustom<String> {
     let chars = chars.into();
     let mut mapped = HashMap::with_capacity(chars.len());
     let strings: Vec<String> = match delim {
-      Some(c) => chars.split(c).map(|c| format!("{}", c)).collect(),
-      None => chars.chars().map(|c| format!("{}", c)).collect(),
+      Some(c) => chars.split(c).map(|c| format!("{}", c)).filter(|s| !s.is_empty()).collect(),
+      None => chars.chars().map(|c| format!("{}", c)).filter(|s| !s.is_empty()).collect(),
     };
     if strings.iter().count() < 2 { panic!("Too few numeric units! Provide two or more.") }
     if strings.iter().count() > 255 { panic!("Too many numeric units!") }

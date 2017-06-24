@@ -55,6 +55,10 @@ assert_eq!(base_music.gen(314159265), "F F# B D# D A# D# F# ");
 When using `BaseCustom::<String>::new` the second parameter must be of `Option<char>` to
 choose your optional delimiter.
 
+### Benchmarks
+
+Benchmarks are provided for the various usages and implementations. `BaseCustom<char>` is
+by far the most efficient implementation.
 
 ## License
 

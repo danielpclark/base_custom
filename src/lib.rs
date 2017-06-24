@@ -64,8 +64,8 @@ use std::ops::Range;
 /// by the delimiter provided.
 pub struct BaseCustom<T> {
   primitives: Vec<T>,
-  primitives_hash: HashMap<T, u32>,
-  base: u32,
+  primitives_hash: HashMap<T, u8>,
+  base: u64,
   delim: Option<char>,
 }
 
@@ -96,20 +96,21 @@ impl BaseCustom<char> {
   /// for measuring the custom numeric base will only be one character long each.
   pub fn new(chars: Vec<char>) -> BaseCustom<char> {
     if chars.iter().count() < 2 { panic!("Too few numeric units! Provide two or more.") }
+    if chars.iter().count() > 255 { panic!("Too many numeric units!") }
     let mut mapped = HashMap::with_capacity(chars.iter().count());
     for (i,c) in chars.iter().enumerate() {
-      mapped.insert(c.clone(), i as u32);
+      mapped.insert(c.clone(), i as u8);
     }
     BaseCustom::<char> {
       primitives: chars.clone(),
       primitives_hash: mapped,
-      base: chars.iter().count() as u32,
+      base: chars.iter().count() as u64,
       delim: None,
     }
   }
 
   /// `gen` returns a String computed from the character mapping and 
-  /// positional values the given u32 parameter evalutes to for your
+  /// positional values the given u64 parameter evalutes to for your
   /// custom base
   ///
   /// # Example
@@ -124,7 +125,7 @@ impl BaseCustom<char> {
   /// ```text
   /// "11"
   /// ```
-  pub fn gen(&self, input_val: u32) -> String {
+  pub fn gen(&self, input_val: u64) -> String {
     if input_val == 0 {
       return format!("{}", self.primitives[0]);
     }
@@ -139,7 +140,7 @@ impl BaseCustom<char> {
   }
 
 
-  /// `decimal` returns a u32 value on computed from the units that form
+  /// `decimal` returns a u64 value on computed from the units that form
   /// the custom base.
   ///
   /// # Example
@@ -154,12 +155,12 @@ impl BaseCustom<char> {
   /// ```text
   /// 3
   /// ```
-  pub fn decimal<S>(&self, input_val: S) -> u32
+  pub fn decimal<S>(&self, input_val: S) -> u64
     where S: Into<String> {
     let input_val = input_val.into();
 
     input_val.chars().rev().enumerate().fold(0, |sum, (i, chr)|
-      sum + self.primitives_hash[&chr] * self.base.pow(i as u32)
+      sum + (self.primitives_hash[&chr] as u64) * self.base.pow(i as u32)
     )
   }
 
@@ -216,23 +217,24 @@ impl BaseCustom<String> {
       None => chars.chars().map(|c| format!("{}", c)).collect(),
     };
     if strings.iter().count() < 2 { panic!("Too few numeric units! Provide two or more.") }
+    if strings.iter().count() > 255 { panic!("Too many numeric units!") }
     let mut enumerator = strings.iter().enumerate();
     loop {
       match enumerator.next() {
-        Some((i,c)) => mapped.insert(format!("{}", c), i as u32),
+        Some((i,c)) => mapped.insert(format!("{}", c), i as u8),
         None => break,
       };
     }
     BaseCustom::<String> {
       primitives: strings.iter().map(|s| format!("{}", s)).collect(),
       primitives_hash: mapped,
-      base: strings.len() as u32,
+      base: strings.len() as u64,
       delim: delim,
     }
   }
 
   /// `gen` returns a String computed from the character mapping and 
-  /// positional values the given u32 parameter evalutes to for your
+  /// positional values the given u64 parameter evalutes to for your
   /// custom base
   ///
   /// # Example
@@ -247,7 +249,7 @@ impl BaseCustom<String> {
   /// ```text
   /// "11"
   /// ```
-  pub fn gen(&self, input_val: u32) -> String {
+  pub fn gen(&self, input_val: u64) -> String {
     if input_val == 0 {
       return format!("{}", self.primitives[0]);
     }
@@ -262,7 +264,7 @@ impl BaseCustom<String> {
     format!("{}", result)
   }
 
-  /// `decimal` returns a u32 value on computed from the units that form
+  /// `decimal` returns a u64 value on computed from the units that form
   /// the custom base.
   ///
   /// # Example
@@ -277,7 +279,7 @@ impl BaseCustom<String> {
   /// ```text
   /// 3
   /// ```
-  pub fn decimal<S>(&self, input_val: S) -> u32
+  pub fn decimal<S>(&self, input_val: S) -> u64
     where S: Into<String> {
     let input_val = input_val.into();
     let strings: Vec<String> = match self.delim {
@@ -286,7 +288,7 @@ impl BaseCustom<String> {
     };
 
     strings.iter().rev().enumerate().fold(0, |sum, (i, chr)|
-      sum + self.primitives_hash[&chr[..]] * self.base.pow(i as u32)
+      sum + (self.primitives_hash[&chr[..]] as u64) * self.base.pow(i as u32)
     )
   }
 

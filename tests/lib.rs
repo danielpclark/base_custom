@@ -42,8 +42,8 @@ fn it_shows_zero_one_and_nth_for_string() {
 #[test]
 fn it_works_with_binary_for_char() {
   let base2 = BaseCustom::<char>::new(vec!['0','1']);
-  assert_eq!(base2.decimal("00001"), 1_u32);
-  assert_eq!(base2.decimal("100110101"), 309_u32);
+  assert_eq!(base2.decimal("00001"), 1_u64);
+  assert_eq!(base2.decimal("100110101"), 309_u64);
   assert_eq!(base2.gen(340), "101010100");
   assert_eq!(base2.gen(0xF45), "111101000101");
   assert_eq!(base2.gen(0b111), "111");
@@ -52,8 +52,8 @@ fn it_works_with_binary_for_char() {
 #[test]
 fn it_works_with_binary_for_char_from_ordinal_range() {
   let base2 = BaseCustom::<char>::from_ordinal_range(48..50);
-  assert_eq!(base2.decimal("00001"), 1_u32);
-  assert_eq!(base2.decimal("100110101"), 309_u32);
+  assert_eq!(base2.decimal("00001"), 1_u64);
+  assert_eq!(base2.decimal("100110101"), 309_u64);
   assert_eq!(base2.gen(340), "101010100");
   assert_eq!(base2.gen(0xF45), "111101000101");
   assert_eq!(base2.gen(0b111), "111");
@@ -63,7 +63,7 @@ fn it_works_with_binary_for_char_from_ordinal_range() {
 fn it_works_with_binary_for_char_from_min_of_ordinal_range() {
   let base2 = BaseCustom::<char>::from_ordinal_range(0..34);
   println!("{}", base2.gen(3));
-  assert_eq!(base2.decimal("!"), 1_u32);
+  assert_eq!(base2.decimal("!"), 1_u64);
   assert_eq!(base2.gen(340), "! ! ! !  ");
 }
 
@@ -71,15 +71,15 @@ fn it_works_with_binary_for_char_from_min_of_ordinal_range() {
 fn it_works_with_binary_for_char_from_max_of_ordinal_range() {
   let base2 = BaseCustom::<char>::from_ordinal_range(125..500);
   println!("{}", base2.gen(3));
-  assert_eq!(base2.decimal("~"), 1_u32);
+  assert_eq!(base2.decimal("~"), 1_u64);
   assert_eq!(base2.gen(340), "~}~}~}~}}");
 }
 
 #[test]
 fn it_works_with_binary_for_string() {
   let base2 = BaseCustom::<String>::new("01", None);
-  assert_eq!(base2.decimal("00001"), 1_u32);
-  assert_eq!(base2.decimal("100110101"), 309_u32);
+  assert_eq!(base2.decimal("00001"), 1_u64);
+  assert_eq!(base2.decimal("100110101"), 309_u64);
   assert_eq!(base2.gen(340), "101010100");
   assert_eq!(base2.gen(0xF45), "111101000101");
   assert_eq!(base2.gen(0b111), "111");

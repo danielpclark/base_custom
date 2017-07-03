@@ -187,6 +187,10 @@ impl BaseCustom<char> {
   }
 
   /// Create a custom numeric base from an ascii range of ordinal values
+  ///
+  /// This method currently restricts the ascii character range of the
+  /// 95 typical characters starting from 32 and ending with 127.  If you'd
+  /// like to use characters outside of this range please use the `new` method.
   pub fn from_ordinal_range(range: Range<u32>) -> BaseCustom<char> {
     let min = std::cmp::max(32, range.start);
     let max = std::cmp::min(127, range.end);

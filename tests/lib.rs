@@ -160,3 +160,22 @@ fn it_works_with_special_characters() {
   let base_sc = BaseCustom::<char>::new("\n01\t".chars().collect());
   assert_eq!(base_sc.gen(12345), "\t\n\n\n\t10");
 }
+
+#[test]
+fn it_implements_parital_equality() {
+  let base3a = BaseCustom::<char>::new("ABC".chars().collect());
+  let base3b = BaseCustom::<char>::new("ABC".chars().collect());
+  assert_eq!(base3a == base3b, true);
+
+  let base3c = BaseCustom::<String>::new("ABC", None);
+  let base3d = BaseCustom::<String>::new("ABC", None);
+  assert_eq!(base3c == base3d, true);
+
+  let base3e = BaseCustom::<char>::new("ABC".chars().collect());
+  let base3f = BaseCustom::<char>::new("BCA".chars().collect());
+  assert_eq!(base3e == base3f, false);
+
+  let base3g = BaseCustom::<String>::new("ABC", None);
+  let base3h = BaseCustom::<String>::new("BCA", None);
+  assert_eq!(base3g == base3h, false);
+}

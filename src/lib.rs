@@ -318,3 +318,19 @@ impl BaseCustom<String> {
     }
   }
 }
+
+impl PartialEq for BaseCustom<char> {
+  fn eq(&self, other: &BaseCustom<char>) -> bool {
+    self.primitives == other.primitives &&
+      self.base == other.base &&
+      self.delim == other.delim
+  }
+}
+
+impl PartialEq for BaseCustom<String> {
+  fn eq(&self, other: &BaseCustom<String>) -> bool {
+    self.primitives == other.primitives &&
+      self.base == other.base &&
+      self.delim == other.delim
+  }
+}

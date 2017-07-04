@@ -1,6 +1,6 @@
 [package]
 name = "base_custom"
-version = "0.1.6"
+version = "0.1.7"
 authors = ["Daniel P. Clark <6ftdan@gmail.com>"]
 description = "Use any characters as your own numeric base and convert to and from decimal."
 documentation = "http://danielpclark.github.io/base_custom/index.html"

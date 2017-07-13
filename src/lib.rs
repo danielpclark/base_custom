@@ -139,6 +139,26 @@ impl BaseCustom<char> {
     format!("{}", result)
   }
 
+  /// `char` returns a char straight from the character mapping.
+  /// decimal value must be within character range for a Some result.
+  ///
+  /// # Example
+  /// ```
+  /// use base_custom::BaseCustom;
+  ///
+  /// let base10 = BaseCustom::<char>::new("0123456789".chars().collect());
+  /// assert_eq!(base10.char(9), Some('9'));
+  /// ```
+  ///
+  /// # Output
+  /// ```text
+  /// '9'
+  /// ```
+  pub fn char(&self, input_val: usize) -> Option<char> {
+    if input_val > self.primitives.len() { return None }
+    Some(self.primitives[input_val])
+  }
+
 
   /// `decimal` returns a u64 value on computed from the units that form
   /// the custom base.

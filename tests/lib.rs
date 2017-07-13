@@ -179,3 +179,9 @@ fn it_implements_parital_equality() {
   let base3h = BaseCustom::<String>::new("BCA", None);
   assert_eq!(base3g == base3h, false);
 }
+
+#[test]
+fn it_gives_the_simple_char_from_char_mapping() {
+  let base10 = BaseCustom::<char>::new("0123456789".chars().collect());
+  assert_eq!(base10.char(9), Some('9'));
+}

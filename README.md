@@ -1,5 +1,5 @@
 # base_custom
-[![Build Status](https://travis-ci.org/danielpclark/base_custom.svg)](https://travis-ci.org/danielpclark/base_custom)
+[![Build Status](https://travis-ci.org/danielpclark/base_custom.svg?branch=master)](https://travis-ci.org/danielpclark/base_custom)
 [![crates.io version](https://img.shields.io/crates/v/base_custom.svg)](https://crates.io/crates/base_custom)
 [![License](https://img.shields.io/crates/l/base_custom.svg)]()
 

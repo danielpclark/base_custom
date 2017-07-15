@@ -185,3 +185,10 @@ fn it_gives_the_simple_char_from_char_mapping() {
   let base10 = BaseCustom::<char>::new("0123456789".chars().collect());
   assert_eq!(base10.char(9), Some('9'));
 }
+
+#[test]
+fn it_can_provide_the_last_symbol_before_roll_over() {
+  let base10 = BaseCustom::<char>::new("0123456789".chars().collect());
+  assert_eq!(base10.base, 10);
+  assert_eq!(base10.char((base10.base - 1) as usize), Some('9'));
+}

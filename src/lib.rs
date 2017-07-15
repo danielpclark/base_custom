@@ -65,7 +65,8 @@ use std::ops::Range;
 pub struct BaseCustom<T> {
   primitives: Vec<T>,
   primitives_hash: HashMap<T, u8>,
-  base: u64,
+  /// The size of the base
+  pub base: u64,
   delim: Option<char>,
 }
 

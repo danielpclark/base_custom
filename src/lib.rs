@@ -88,6 +88,18 @@ impl fmt::Debug for BaseCustom<String> {
   }
 }
 
+fn unique(chars: Vec<char>) -> Vec<char> {
+  let mut a = chars.clone();
+  for x in (0..a.len()).rev() {
+    for y in (x+1..a.len()).rev() {
+      if a[x] == a[y] {
+        a.remove(y);
+      }
+    }
+  }
+  a
+}
+
 impl BaseCustom<char> {
 
   /// 'new' creates a new BaseCustom instance and propogates the values for converting
@@ -99,17 +111,7 @@ impl BaseCustom<char> {
     if chars.iter().count() < 2 { panic!("Too few numeric units! Provide two or more.") }
     if chars.iter().count() > 255 { panic!("Too many numeric units!") }
 
-    let chars = { // unique
-      let mut a = chars.clone();
-      for x in (0..a.len()).rev() {
-        for y in (x+1..a.len()).rev() {
-          if a[x] == a[y] {
-            a.remove(y);
-          }
-        }
-      }
-      a
-    };
+    let chars = unique(chars);
 
     let mut mapped = HashMap::with_capacity(chars.iter().count());
     for (i,c) in chars.iter().enumerate() {
@@ -252,7 +254,7 @@ impl BaseCustom<String> {
     let mut mapped = HashMap::with_capacity(chars.len());
     let strings: Vec<String> = match delim {
       Some(c) => chars.split(c).map(|c| format!("{}", c)).filter(|s| !s.is_empty()).collect(),
-      None => chars.chars().map(|c| format!("{}", c)).filter(|s| !s.is_empty()).collect(),
+      None => unique(chars.chars().collect()).iter().map(|c| format!("{}", c)).filter(|s| !s.is_empty()).collect(),
     };
     if strings.iter().count() < 2 { panic!("Too few numeric units! Provide two or more.") }
     if strings.iter().count() > 255 { panic!("Too many numeric units!") }

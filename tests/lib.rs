@@ -111,6 +111,16 @@ fn it_works_with_binary_for_string() {
 }
 
 #[test]
+fn it_works_with_binary_for_string_with_duplicates() {
+  let base2 = BaseCustom::<String>::new("00011", None);
+  assert_eq!(base2.decimal("00001"), 1_u64);
+  assert_eq!(base2.decimal("100110101"), 309_u64);
+  assert_eq!(base2.gen(340), "101010100");
+  assert_eq!(base2.gen(0xF45), "111101000101");
+  assert_eq!(base2.gen(0b111), "111");
+}
+
+#[test]
 fn it_works_with_trinary_for_char() {
   let base3 = BaseCustom::<char>::new("ABC".chars().collect());
   assert_eq!(base3.decimal("ABC"), 5);

@@ -50,6 +50,16 @@ fn it_works_with_binary_for_char() {
 }
 
 #[test]
+fn it_works_with_binary_for_char_iwth_duplicates() {
+  let base2 = BaseCustom::<char>::new(vec!['0','0','0','1','1']);
+  assert_eq!(base2.decimal("00001"), 1_u64);
+  assert_eq!(base2.decimal("100110101"), 309_u64);
+  assert_eq!(base2.gen(340), "101010100");
+  assert_eq!(base2.gen(0xF45), "111101000101");
+  assert_eq!(base2.gen(0b111), "111");
+}
+
+#[test]
 fn it_works_with_binary_for_char_from_ordinal_range() {
   let base2 = BaseCustom::<char>::from_ordinal_range(48..50);
   assert_eq!(base2.decimal("00001"), 1_u64);

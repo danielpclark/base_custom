@@ -98,6 +98,19 @@ impl BaseCustom<char> {
   pub fn new(chars: Vec<char>) -> BaseCustom<char> {
     if chars.iter().count() < 2 { panic!("Too few numeric units! Provide two or more.") }
     if chars.iter().count() > 255 { panic!("Too many numeric units!") }
+
+    let chars = { // unique
+      let mut a = chars.clone();
+      for x in (0..a.len()).rev() {
+        for y in (x+1..a.len()).rev() {
+          if a[x] == a[y] {
+            a.remove(y);
+          }
+        }
+      }
+      a
+    };
+
     let mut mapped = HashMap::with_capacity(chars.iter().count());
     for (i,c) in chars.iter().enumerate() {
       mapped.insert(c.clone(), i as u8);

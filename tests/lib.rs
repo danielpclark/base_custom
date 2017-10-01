@@ -24,6 +24,12 @@ fn nth_should_return_none_for_out_of_bounds() {
 }
 
 #[test]
+fn nth_should_return_zero_for_zero() {
+  let base3 = BaseCustom::<char>::new("ABC".chars().collect());
+  assert_eq!(base3.nth(0), Some(&'A'));
+}
+
+#[test]
 fn it_shows_zero_one_and_nth_for_char() {
   let base3 = BaseCustom::<char>::new("ABC".chars().collect());
   assert_eq!(base3.zero(), &'A');

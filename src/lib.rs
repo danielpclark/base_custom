@@ -62,6 +62,7 @@ use std::ops::Range;
 /// and conversion methods are available to use then.  String groupings will be single character
 /// strings if no delimiter is given, otherwise they may be strings of any length split only
 /// by the delimiter provided.
+#[derive(Clone)]
 pub struct BaseCustom<T> {
   primitives: Vec<T>,
   primitives_hash: HashMap<T, u8>,

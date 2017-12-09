@@ -299,7 +299,7 @@ impl BaseCustom<String> {
     loop {
       if number == 0 { break };
       if self.delim != None { result.insert(0, self.delim.unwrap()) };
-      result.insert_str(0, &self.primitives[(number % self.base) as usize][..]);
+      result = format!("{}{}", self.primitives[(number % self.base) as usize], result);
       number = number/self.base;
     };
     format!("{}", result)

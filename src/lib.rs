@@ -41,7 +41,8 @@
 //!
 //! This is licensed under MIT or APACHE 2.0 at your option.
 
-use std::collections::HashMap;
+use std::error::Error;
+use std::fmt;
 
 /// The BaseCustom struct holds the information to perform number conversions
 /// via the `gen` and `decimal` methods.
@@ -62,11 +63,39 @@ use std::collections::HashMap;
 #[derive(Clone)]
 pub struct BaseCustom<T> {
   primitives: Vec<T>,
-  primitives_hash: HashMap<T, u8>,
+  primitives_hash: util::UnitMap<T>,
   /// The size of the base
   pub base: u64,
   delim: Option<char>,
+  // Positions of ASCII chars (for `char`) or of every byte (for `u8`), so
+  // lookups of those units skip hashing.  Empty for `String`.
+  table: Vec<Option<u8>>,
 }
+
+/// Why `try_decimal` could not read a value.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum DecimalError {
+  /// A unit is not part of the base.  `position` counts units from the start
+  /// of the input, beginning at zero.
+  UnknownUnit {
+    /// Index of the unit in the input.
+    position: usize,
+  },
+  /// The value is larger than `u64::MAX`.
+  Overflow,
+}
+
+impl fmt::Display for DecimalError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    match *self {
+      DecimalError::UnknownUnit { position } =>
+        write!(f, "unit at position {} is not part of this numeric base", position),
+      DecimalError::Overflow => write!(f, "value is too large for a u64"),
+    }
+  }
+}
+
+impl Error for DecimalError {}
 
 mod u8;
 mod char;

@@ -1,6 +1,5 @@
-use std::collections::HashMap;
-use crate::util::unique;
-use crate::BaseCustom;
+use crate::util::{index_units, small_table, fill_places, fold_places, expect_decimal};
+use crate::{BaseCustom, DecimalError};
 use std::ops::Range;
 use std::fmt;
 
@@ -11,21 +10,20 @@ impl BaseCustom<char> {
   ///
   /// `new` for `BaseCustom<char>` requires a `Vec<char>` as its parameters and units
   /// for measuring the custom numeric base will only be one character long each.
+  ///
+  /// Repeated characters are ignored after their first occurrence.
   pub fn new(chars: Vec<char>) -> BaseCustom<char> {
     if chars.iter().count() < 2 { panic!("Too few numeric units! Provide two or more.") }
+
+    let (chars, mapped) = index_units(chars);
     if chars.iter().count() > 255 { panic!("Too many numeric units!") }
 
-    let chars = unique(chars);
-
-    let mut mapped = HashMap::with_capacity(chars.iter().count());
-    for (i,c) in chars.iter().enumerate() {
-      mapped.insert(c.clone(), i as u8);
-    }
     BaseCustom::<char> {
       primitives: chars.clone(),
       primitives_hash: mapped,
       base: chars.iter().count() as u64,
       delim: None,
+      table: small_table(chars.iter().enumerate().map(|(i, &c)| (c as usize, i as u8)), 128),
     }
   }
 
@@ -46,17 +44,13 @@ impl BaseCustom<char> {
   /// "11"
   /// ```
   pub fn gen(&self, input_val: u64) -> String {
-    if input_val == 0 {
-      return format!("{}", self.primitives[0]);
+    let mut buf = [0; 64];
+    let places = fill_places(input_val, self.base, &mut buf);
+    let mut result = String::with_capacity(places.len());
+    for &place in places {
+      result.push(self.primitives[place as usize]);
     }
-    let mut number = input_val;
-    let mut result = String::new();
-    loop {
-      if number == 0 { break };
-      result.insert(0, self.primitives[(number % self.base) as usize]);
-      number = number/self.base;
-    };
-    format!("{}", result)
+    result
   }
 
   /// `char` returns a char straight from the character mapping.
@@ -75,7 +69,7 @@ impl BaseCustom<char> {
   /// '9'
   /// ```
   pub fn char(&self, input_val: usize) -> Option<char> {
-    if input_val > self.primitives.len() { return None }
+    if input_val >= self.primitives.len() { return None }
     Some(self.primitives[input_val])
   }
 
@@ -95,13 +89,49 @@ impl BaseCustom<char> {
   /// ```text
   /// 3
   /// ```
+  ///
+  /// _This panics if a character is not part of the base or the value does not
+  /// fit in a `u64`.  `try_decimal` returns an error instead._
   pub fn decimal<S>(&self, input_val: S) -> u64
     where S: Into<String> {
-    let input_val = input_val.into();
+    expect_decimal(self.try_decimal(input_val.into()))
+  }
 
-    input_val.chars().rev().enumerate().fold(0, |sum, (i, chr)|
-      sum + (self.primitives_hash[&chr] as u64) * self.base.pow(i as u32)
-    )
+  /// `try_decimal` is `decimal` returning an error, instead of panicking, for a
+  /// character outside the base or a value larger than `u64::MAX`.
+  ///
+  /// # Example
+  /// ```
+  /// use base_custom::{BaseCustom, DecimalError};
+  ///
+  /// let base2 = BaseCustom::<char>::new(vec!['0','1']);
+  /// assert_eq!(base2.try_decimal("00011"), Ok(3));
+  /// assert_eq!(base2.try_decimal("0012"), Err(DecimalError::UnknownUnit { position: 3 }));
+  /// ```
+  pub fn try_decimal<S>(&self, input_val: S) -> Result<u64, DecimalError>
+    where S: AsRef<str> {
+    fold_places(input_val.as_ref().chars().map(|c| self.position_u8(c)), self.base)
+  }
+
+  /// `position` returns the place value of a character, the reverse of `nth`.
+  ///
+  /// # Example
+  /// ```
+  /// use base_custom::BaseCustom;
+  ///
+  /// let base16 = BaseCustom::<char>::new("0123456789abcdef".chars().collect());
+  /// assert_eq!(base16.position('a'), Some(10));
+  /// assert_eq!(base16.position('g'), None);
+  /// ```
+  pub fn position(&self, unit: char) -> Option<usize> {
+    self.position_u8(unit).map(|p| p as usize)
+  }
+
+  fn position_u8(&self, unit: char) -> Option<u8> {
+    match self.table.get(unit as usize) {
+      Some(&place) => place,
+      None => self.primitives_hash.get(&unit).cloned(),
+    }
   }
 
   /// Returns the zero value of your custom base

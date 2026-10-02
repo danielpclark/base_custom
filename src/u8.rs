@@ -1,5 +1,5 @@
 use crate::util::{
-  check_unit_count, expect_decimal, fold_places, index_units, places, small_table,
+  check_unit_count, expect_decimal, fill_places, fold_places, index_units, small_table,
 };
 use crate::{BaseCustom, DecimalError};
 use std::fmt;
@@ -48,11 +48,11 @@ impl BaseCustom<u8> {
   /// vec![0x01, 0x01]
   /// ```
   pub fn gen(&self, input_val: u64) -> Vec<u8> {
-    let mut bytes: Vec<u8> = places(input_val, self.base)
-      .map(|place| self.primitives[place])
-      .collect();
-    bytes.reverse();
-    bytes
+    let mut buf = [0; 64];
+    fill_places(input_val, self.base, &mut buf)
+      .iter()
+      .map(|&place| self.primitives[usize::from(place)])
+      .collect()
   }
 
   /// `decimal` returns a u64 value on computed from the units that form

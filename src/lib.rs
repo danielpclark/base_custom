@@ -63,7 +63,11 @@
 //!
 //! This is licensed under MIT or APACHE 2.0 at your option.
 
-use std::collections::HashMap;
+// Compile and run the README examples as doctests.
+#[cfg(doctest)]
+#[doc = include_str!("../README.md")]
+pub struct ReadmeDoctests;
+
 use std::error::Error;
 use std::fmt;
 
@@ -89,7 +93,7 @@ use std::fmt;
 #[derive(Clone)]
 pub struct BaseCustom<T> {
   primitives: Vec<T>,
-  primitives_hash: HashMap<T, u8>,
+  primitives_hash: util::UnitMap<T>,
   /// The size of the base
   pub base: u64,
   delim: Option<char>,

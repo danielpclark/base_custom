@@ -1,4 +1,4 @@
-use crate::util::{check_unit_count, expect_decimal, fold_places, index_units, places};
+use crate::util::{check_unit_count, expect_decimal, fill_places, fold_places, index_units};
 use crate::{BaseCustom, DecimalError};
 use std::fmt;
 
@@ -65,13 +65,10 @@ impl BaseCustom<String> {
     if input_val == 0 {
       return self.primitives[0].clone();
     }
-    let mut units: Vec<&str> = places(input_val, self.base)
-      .map(|place| self.primitives[place].as_str())
-      .collect();
-    units.reverse();
+    let mut buf = [0; 64];
     let mut result = String::new();
-    for unit in units {
-      result.push_str(unit);
+    for &place in fill_places(input_val, self.base, &mut buf) {
+      result.push_str(&self.primitives[usize::from(place)]);
       if let Some(delim) = self.delim {
         result.push(delim);
       }

@@ -1,5 +1,5 @@
 use crate::util::{
-  check_unit_count, expect_decimal, fold_places, index_units, places, small_table,
+  check_unit_count, expect_decimal, fill_places, fold_places, index_units, small_table,
 };
 use crate::{BaseCustom, DecimalError};
 use std::fmt;
@@ -50,11 +50,13 @@ impl BaseCustom<char> {
   /// "11"
   /// ```
   pub fn gen(&self, input_val: u64) -> String {
-    let mut chars: Vec<char> = places(input_val, self.base)
-      .map(|place| self.primitives[place])
-      .collect();
-    chars.reverse();
-    chars.into_iter().collect()
+    let mut buf = [0; 64];
+    let places = fill_places(input_val, self.base, &mut buf);
+    let mut result = String::with_capacity(places.len());
+    for &place in places {
+      result.push(self.primitives[usize::from(place)]);
+    }
+    result
   }
 
   /// `char` returns a char straight from the character mapping.

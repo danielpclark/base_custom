@@ -1,5 +1,3 @@
-extern crate base_custom;
-
 #[cfg(test)]
 mod u8 {
   use base_custom::BaseCustom;
@@ -31,10 +29,11 @@ mod u8 {
   }
 
   #[test]
-  fn nth_works(){
-    let b = BaseCustom::<u8>::new(
-      &[0xE8,0xB0,0x88,0x6D,0x97,0x18,0x4F,0x1F,0x65,0xC7,0x67,0xF7,0x93,0x99,0x65,0xBF]
-    );
+  fn nth_works() {
+    let b = BaseCustom::<u8>::new(&[
+      0xE8, 0xB0, 0x88, 0x6D, 0x97, 0x18, 0x4F, 0x1F, 0x65, 0xC7, 0x67, 0xF7, 0x93, 0x99, 0x65,
+      0xBF,
+    ]);
 
     assert_eq!(b.nth(0), Some(0xE8));
   }
@@ -83,11 +82,11 @@ mod u8 {
   fn it_implements_parital_equality() {
     let base3a = BaseCustom::<u8>::new(b"ABC");
     let base3b = BaseCustom::<u8>::new(b"ABC");
-    assert_eq!(base3a == base3b, true);
-  
+    assert!(base3a == base3b);
+
     let base3e = BaseCustom::<u8>::new(b"ABC");
     let base3f = BaseCustom::<u8>::new(b"BCA");
-    assert_eq!(base3e == base3f, false);
+    assert!(base3e != base3f);
   }
 }
 
@@ -123,7 +122,7 @@ mod char {
 
   #[test]
   fn it_works_with_binary() {
-    let base2 = BaseCustom::<char>::new(vec!['0','1']);
+    let base2 = BaseCustom::<char>::new(vec!['0', '1']);
     assert_eq!(base2.decimal("00001"), 1_u64);
     assert_eq!(base2.decimal("100110101"), 309_u64);
     assert_eq!(base2.gen(340), "101010100");
@@ -133,7 +132,7 @@ mod char {
 
   #[test]
   fn it_works_with_binary_with_duplicates() {
-    let base2 = BaseCustom::<char>::new(vec!['0','0','0','1','1']);
+    let base2 = BaseCustom::<char>::new(vec!['0', '0', '0', '1', '1']);
     assert_eq!(base2.decimal("00001"), 1_u64);
     assert_eq!(base2.decimal("100110101"), 309_u64);
     assert_eq!(base2.gen(340), "101010100");
@@ -196,11 +195,11 @@ mod char {
   fn it_implements_parital_equality() {
     let base3a = BaseCustom::<char>::new("ABC".chars().collect());
     let base3b = BaseCustom::<char>::new("ABC".chars().collect());
-    assert_eq!(base3a == base3b, true);
-  
+    assert!(base3a == base3b);
+
     let base3e = BaseCustom::<char>::new("ABC".chars().collect());
     let base3f = BaseCustom::<char>::new("BCA".chars().collect());
-    assert_eq!(base3e == base3f, false);
+    assert!(base3e != base3f);
   }
 
   #[test]
@@ -245,8 +244,14 @@ mod string {
   fn it_can_convert_base_10_on_u64_max_with_delimiter() {
     let b10stringdelim = BaseCustom::<String>::new(".0.1.2.3.4.5.6.7.8.9..", Some('.'));
     assert_eq!(b10stringdelim.gen(184), "1.8.4.");
-    assert_eq!(b10stringdelim.gen(18446744073709551615), "1.8.4.4.6.7.4.4.0.7.3.7.0.9.5.5.1.6.1.5.");
-    assert_eq!(b10stringdelim.decimal("1.8.4.4.6.7.4.4.0.7.3.7.0.9.5.5.1.6.1.5"), 18446744073709551615);
+    assert_eq!(
+      b10stringdelim.gen(18446744073709551615),
+      "1.8.4.4.6.7.4.4.0.7.3.7.0.9.5.5.1.6.1.5."
+    );
+    assert_eq!(
+      b10stringdelim.decimal("1.8.4.4.6.7.4.4.0.7.3.7.0.9.5.5.1.6.1.5"),
+      18446744073709551615
+    );
   }
 
   #[test]
@@ -286,13 +291,13 @@ mod string {
   #[test]
   fn it_works_with_a_delimiter_gen() {
     let base = BaseCustom::<String>::new("a bb ccc dddd", Some(' '));
-    assert_eq!(base.gen( 20 ), "bb bb a ");
+    assert_eq!(base.gen(20), "bb bb a ");
   }
 
   #[test]
   fn it_works_with_a_delimiter_decimal() {
     let base = BaseCustom::<String>::new("a bb ccc dddd", Some(' '));
-    assert_eq!(base.decimal( "bb bb a " ), 20);
+    assert_eq!(base.decimal("bb bb a "), 20);
   }
 
   #[test]
@@ -314,10 +319,10 @@ mod string {
   fn it_implements_parital_equality() {
     let base3c = BaseCustom::<String>::new("ABC", None);
     let base3d = BaseCustom::<String>::new("ABC", None);
-    assert_eq!(base3c == base3d, true);
-  
+    assert!(base3c == base3d);
+
     let base3g = BaseCustom::<String>::new("ABC", None);
     let base3h = BaseCustom::<String>::new("BCA", None);
-    assert_eq!(base3g == base3h, false);
+    assert!(base3g != base3h);
   }
 }

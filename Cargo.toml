@@ -1,15 +1,15 @@
 [package]
 name = "base_custom"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Daniel P. Clark <6ftdan@gmail.com>"]
+edition = "2021"
+rust-version = "1.56"
 description = "Use any characters as your own numeric base and convert to and from decimal."
-documentation = "http://danielpclark.github.io/base_custom/index.html"
+documentation = "https://docs.rs/base_custom"
 homepage = "https://github.com/danielpclark/base_custom"
 repository = "https://github.com/danielpclark/base_custom"
 license = "MIT OR Apache-2.0"
 readme = "README.md"
 keywords = ["numeric","base","conversion","decimal"]
 categories = ["cryptography", "data-structures"]
-
-[badges]
-travis-ci = { repository = "danielpclark/base_custom", branch = "master" }
+exclude = ["benchmarks"]

@@ -1,46 +1,49 @@
-use std::collections::HashMap;
-use crate::util::unique;
-use crate::BaseCustom;
+use crate::util::{check_unit_count, expect_decimal, fold_places, index_units, places};
+use crate::{BaseCustom, DecimalError};
 use std::fmt;
 
 impl BaseCustom<String> {
-
   /// 'new' creates a new BaseCustom instance and propogates the values for converting
   /// numeric bases.
-  /// 
+  ///
   /// `new` for `BaseCustom<String>` requires a `String` as its first parameter and units
   /// for measuring the custom numeric base can be one character long, or many in length.
   /// The second parameter is of `Option<char>` is a delimiter option for determining whether
   /// to split the string into single character length strings or possibly multiple length
   /// if the delimiter is partitioning the string in such a way.
-  pub fn new<S>(chars: S, delim: Option<char>) -> BaseCustom<String> 
-    where S: Into<String> {
+  ///
+  /// Empty units are skipped and repeated units are ignored after their first
+  /// occurrence.  This panics unless 2 to 255 distinct units remain.
+  pub fn new<S>(chars: S, delim: Option<char>) -> BaseCustom<String>
+  where
+    S: Into<String>,
+  {
     let chars = chars.into();
-    let mut mapped = HashMap::with_capacity(chars.len());
-    let strings: Vec<String> = match delim {
-      Some(c) => chars.split(c).map(|c| format!("{}", c)).filter(|s| !s.is_empty()).collect(),
-      None => unique(chars.chars().collect()).iter().map(|c| format!("{}", c)).filter(|s| !s.is_empty()).collect(),
+    let units: Vec<String> = match delim {
+      Some(c) => chars
+        .split(c)
+        .filter(|s| !s.is_empty())
+        .map(String::from)
+        .collect(),
+      None => chars.chars().map(String::from).collect(),
     };
-    if strings.iter().count() < 2 { panic!("Too few numeric units! Provide two or more.") }
-    if strings.iter().count() > 255 { panic!("Too many numeric units!") }
-    let mut enumerator = strings.iter().enumerate();
-    loop {
-      match enumerator.next() {
-        Some((i,c)) => mapped.insert(format!("{}", c), i as u8),
-        None => break,
-      };
-    }
+    let (units, mapped) = index_units(units);
+    check_unit_count(units.len(), 255);
     BaseCustom::<String> {
-      primitives: strings.iter().map(|s| format!("{}", s)).collect(),
+      base: units.len() as u64,
+      primitives: units,
       primitives_hash: mapped,
-      base: strings.len() as u64,
-      delim: delim,
+      delim,
+      table: Vec::new(),
     }
   }
 
-  /// `gen` returns a String computed from the character mapping and 
+  /// `gen` returns a String computed from the character mapping and
   /// positional values the given u64 parameter evalutes to for your
   /// custom base
+  ///
+  /// With a delimiter every unit is followed by the delimiter, except for
+  /// zero which is the zero unit alone.
   ///
   /// # Example
   /// ```
@@ -48,6 +51,10 @@ impl BaseCustom<String> {
   ///
   /// let base2 = BaseCustom::<String>::new("01", None);
   /// assert_eq!(base2.gen(3), "11");
+  ///
+  /// let notes = BaseCustom::<String>::new("do re mi", Some(' '));
+  /// assert_eq!(notes.gen(5), "re mi ");
+  /// assert_eq!(notes.gen(0), "do");
   /// ```
   ///
   /// # Output
@@ -56,17 +63,20 @@ impl BaseCustom<String> {
   /// ```
   pub fn gen(&self, input_val: u64) -> String {
     if input_val == 0 {
-      return format!("{}", self.primitives[0]);
+      return self.primitives[0].clone();
     }
-    let mut number = input_val;
+    let mut units: Vec<&str> = places(input_val, self.base)
+      .map(|place| self.primitives[place].as_str())
+      .collect();
+    units.reverse();
     let mut result = String::new();
-    loop {
-      if number == 0 { break };
-      if self.delim != None { result.insert(0, self.delim.unwrap()) };
-      result = format!("{}{}", self.primitives[(number % self.base) as usize], result);
-      number = number/self.base;
-    };
-    format!("{}", result)
+    for unit in units {
+      result.push_str(unit);
+      if let Some(delim) = self.delim {
+        result.push(delim);
+      }
+    }
+    result
   }
 
   /// `decimal` returns a u64 value on computed from the units that form
@@ -84,17 +94,71 @@ impl BaseCustom<String> {
   /// ```text
   /// 3
   /// ```
+  ///
+  /// _This panics if a unit is not part of the base or the value does not
+  /// fit in a `u64`.  Use `try_decimal` to handle those cases._
   pub fn decimal<S>(&self, input_val: S) -> u64
-    where S: Into<String> {
-    let input_val = input_val.into();
-    let strings: Vec<String> = match self.delim {
-      Some(c) => input_val.split(c).filter(|c| !c.is_empty()).map(|c| format!("{}", c)).collect(),
-      None => input_val.chars().map(|c| format!("{}", c)).collect(),
-    };
+  where
+    S: Into<String>,
+  {
+    expect_decimal(self.try_decimal(input_val.into()))
+  }
 
-    strings.iter().rev().enumerate().fold(0, |sum, (i, chr)|
-      sum + (self.primitives_hash[&chr[..]] as u64) * self.base.pow(i as u32)
-    )
+  /// `try_decimal` is `decimal` returning an error, instead of panicking,
+  /// for a unit outside the base or a value larger than `u64::MAX`.
+  ///
+  /// With a delimiter, empty units between repeated delimiters are skipped
+  /// and do not count towards an error's position.
+  ///
+  /// # Example
+  /// ```
+  /// use base_custom::{BaseCustom, DecimalError};
+  ///
+  /// let notes = BaseCustom::<String>::new("do re mi", Some(' '));
+  /// assert_eq!(notes.try_decimal("re mi"), Ok(5));
+  /// assert_eq!(notes.try_decimal("re fa"), Err(DecimalError::UnknownUnit { position: 1 }));
+  /// ```
+  pub fn try_decimal<S>(&self, input_val: S) -> Result<u64, DecimalError>
+  where
+    S: AsRef<str>,
+  {
+    let input = input_val.as_ref();
+    match self.delim {
+      Some(c) => fold_places(
+        input
+          .split(c)
+          .filter(|s| !s.is_empty())
+          .map(|unit| self.position_u8(unit)),
+        self.base,
+      ),
+      None => {
+        let mut buf = [0u8; 4];
+        fold_places(
+          input
+            .chars()
+            .map(|c| self.position_u8(c.encode_utf8(&mut buf))),
+          self.base,
+        )
+      }
+    }
+  }
+
+  /// `position` returns the place value of a single unit, the reverse of `nth`.
+  ///
+  /// # Example
+  /// ```
+  /// use base_custom::BaseCustom;
+  ///
+  /// let notes = BaseCustom::<String>::new("do re mi", Some(' '));
+  /// assert_eq!(notes.position("mi"), Some(2));
+  /// assert_eq!(notes.position("fa"), None);
+  /// ```
+  pub fn position(&self, unit: &str) -> Option<usize> {
+    self.position_u8(unit).map(usize::from)
+  }
+
+  fn position_u8(&self, unit: &str) -> Option<u8> {
+    self.primitives_hash.get(unit).copied()
   }
 
   /// Returns the zero value of your custom base
@@ -108,21 +172,18 @@ impl BaseCustom<String> {
   }
 
   /// Returns the nth value of your custom base
-  /// 
+  ///
   /// Like most indexing operations, the count starts from zero, so nth(0) returns the first value,
   /// nth(1) the second, and so on.
   pub fn nth(&self, pos: usize) -> Option<&str> {
-    if pos > 0 && pos < self.base as usize {
-      Some(&self.primitives[pos])
-    } else {
-      None
-    }
+    self.primitives.get(pos).map(String::as_str)
   }
 }
 
 impl fmt::Debug for BaseCustom<String> {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f,
+    write!(
+      f,
       "BaseCustom\n\tprimitives: {:?}\n\tprimitives_hash: {:?}\n\tbase: {}\n\tdelim: {:?}",
       self.primitives, self.primitives_hash, self.base, self.delim
     )
@@ -131,8 +192,8 @@ impl fmt::Debug for BaseCustom<String> {
 
 impl PartialEq for BaseCustom<String> {
   fn eq(&self, other: &BaseCustom<String>) -> bool {
-    self.primitives == other.primitives &&
-      self.base == other.base &&
-      self.delim == other.delim
+    self.primitives == other.primitives && self.base == other.base && self.delim == other.delim
   }
 }
+
+impl Eq for BaseCustom<String> {}

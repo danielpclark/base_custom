@@ -1,3 +1,5 @@
+extern crate base_custom;
+
 #[cfg(test)]
 mod u8 {
   use base_custom::BaseCustom;

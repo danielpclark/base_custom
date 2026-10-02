@@ -63,10 +63,18 @@
 //!
 //! This is licensed under MIT or APACHE 2.0 at your option.
 
-// Compile and run the README examples as doctests.
+// Compile and run the README examples as doctests.  The attribute sits in a
+// macro so compilers older than 1.54, which cannot parse `include_str!` in an
+// attribute, never see it (`cfg(doctest)` is only set by rustdoc).
 #[cfg(doctest)]
-#[doc = include_str!("../README.md")]
-pub struct ReadmeDoctests;
+macro_rules! readme_doctests {
+  () => {
+    #[doc = include_str!("../README.md")]
+    pub struct ReadmeDoctests;
+  };
+}
+#[cfg(doctest)]
+readme_doctests!();
 
 use std::error::Error;
 use std::fmt;
@@ -104,7 +112,6 @@ pub struct BaseCustom<T> {
 
 /// Why a value could not be read as a number by `try_decimal`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-#[non_exhaustive]
 pub enum DecimalError {
   /// A unit is not part of the base.  `position` counts units from the
   /// start of the input, beginning at zero.

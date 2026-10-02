@@ -2,8 +2,7 @@
 name = "base_custom"
 version = "0.2.1"
 authors = ["Daniel P. Clark <6ftdan@gmail.com>"]
-edition = "2021"
-rust-version = "1.56"
+rust-version = "1.30"
 description = "Use any characters as your own numeric base and convert to and from decimal."
 documentation = "https://docs.rs/base_custom"
 homepage = "https://github.com/danielpclark/base_custom"

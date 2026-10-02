@@ -9,10 +9,10 @@ building a base: `char` alphabets of 10 and 95 units, 12 delimited `String` unit
 
 | input | 0.2.0 | 0.2.1 | speedup |
 |---:|---:|---:|---:|
-| char/10 | 227 ns (224 ns – 230 ns) | 212 ns (212 ns – 213 ns) | 1.07× |
-| char/95 | 4.9 µs (4.87 µs – 4.94 µs) | 637 ns (625 ns – 645 ns) | 7.7× |
-| string_delimited/12 | 2.23 µs (2.21 µs – 2.26 µs) | 1.06 µs (1.04 µs – 1.08 µs) | 2.11× |
-| u8/256 | 21 µs (20.5 µs – 23.8 µs) | 1.63 µs (1.62 µs – 1.63 µs) | 12.9× |
+| char/10 | 217 ns (201 ns – 228 ns) | 210 ns (209 ns – 212 ns) | 1.04× |
+| char/95 | 4.66 µs (4.64 µs – 4.71 µs) | 697 ns (693 ns – 704 ns) | 6.68× |
+| string_delimited/12 | 2.41 µs (2.4 µs – 2.43 µs) | 857 ns (849 ns – 871 ns) | 2.81× |
+| u8/256 | 26.6 µs (26.3 µs – 26.7 µs) | 1.65 µs (1.64 µs – 1.66 µs) | 16.1× |
 
 ### gen
 
@@ -20,13 +20,13 @@ building a base: `char` alphabets of 10 and 95 units, 12 delimited `String` unit
 
 | input | 0.2.0 | 0.2.1 | speedup |
 |---:|---:|---:|---:|
-| char_binary/u64_max | 416 ns (414 ns – 420 ns) | 350 ns (346 ns – 355 ns) | 1.19× |
-| char_decimal/12345 | 67.4 ns (67.3 ns – 67.5 ns) | 23.1 ns (23 ns – 23.4 ns) | 2.92× |
-| char_decimal/u64_max | 182 ns (174 ns – 190 ns) | 95.9 ns (95.6 ns – 96.3 ns) | 1.89× |
-| char_hex/u64_max | 130 ns (128 ns – 132 ns) | 67.1 ns (64.5 ns – 67.4 ns) | 1.94× |
-| string/u64_max | 941 ns (938 ns – 948 ns) | 170 ns (170 ns – 171 ns) | 5.54× |
-| string_delimited/u64_max | 1.45 µs (1.44 µs – 1.47 µs) | 202 ns (188 ns – 207 ns) | 7.2× |
-| u8_binary/u64_max | 453 ns (434 ns – 514 ns) | 262 ns (256 ns – 277 ns) | 1.73× |
+| char_binary/u64_max | 500 ns (481 ns – 514 ns) | 330 ns (328 ns – 339 ns) | 1.51× |
+| char_decimal/12345 | 65.9 ns (65.5 ns – 66.7 ns) | 24.1 ns (23.6 ns – 24.5 ns) | 2.74× |
+| char_decimal/u64_max | 196 ns (192 ns – 202 ns) | 92 ns (88.3 ns – 94 ns) | 2.13× |
+| char_hex/u64_max | 119 ns (116 ns – 121 ns) | 71 ns (68.7 ns – 71.5 ns) | 1.67× |
+| string/u64_max | 891 ns (884 ns – 903 ns) | 170 ns (170 ns – 172 ns) | 5.23× |
+| string_delimited/u64_max | 1.41 µs (1.39 µs – 1.42 µs) | 189 ns (186 ns – 194 ns) | 7.43× |
+| u8_binary/u64_max | 480 ns (472 ns – 483 ns) | 328 ns (322 ns – 334 ns) | 1.46× |
 
 ### decimal
 
@@ -34,12 +34,12 @@ building a base: `char` alphabets of 10 and 95 units, 12 delimited `String` unit
 
 | input | 0.2.0 | 0.2.1 | speedup |
 |---:|---:|---:|---:|
-| char_binary/u64_max | 630 ns (603 ns – 710 ns) | 119 ns (118 ns – 121 ns) | 5.3× |
-| char_decimal/12345 | 63.8 ns (63.2 ns – 64.9 ns) | 24.8 ns (23.9 ns – 25.6 ns) | 2.58× |
-| char_decimal/u64_max | 196 ns (191 ns – 200 ns) | 42.3 ns (41.9 ns – 43 ns) | 4.63× |
-| char_hex/u64_max | 208 ns (207 ns – 210 ns) | 44.4 ns (41.3 ns – 45.4 ns) | 4.68× |
-| char_non_ascii/u64_max | 247 ns (246 ns – 249 ns) | 79.6 ns (79.4 ns – 79.8 ns) | 3.1× |
-| string/u64_max | 1.25 µs (1.23 µs – 1.26 µs) | 189 ns (188 ns – 190 ns) | 6.62× |
-| string_delimited/u64_max | 1.13 µs (1.11 µs – 1.23 µs) | 225 ns (221 ns – 228 ns) | 5.03× |
-| u8_binary/u64_max | 619 ns (602 ns – 638 ns) | 80.5 ns (80.4 ns – 80.6 ns) | 7.7× |
+| char_binary/u64_max | 606 ns (588 ns – 636 ns) | 138 ns (136 ns – 140 ns) | 4.39× |
+| char_decimal/12345 | 56.7 ns (56.2 ns – 57.5 ns) | 24.4 ns (23.9 ns – 25.1 ns) | 2.32× |
+| char_decimal/u64_max | 207 ns (205 ns – 216 ns) | 48.1 ns (47.3 ns – 49.1 ns) | 4.31× |
+| char_hex/u64_max | 180 ns (178 ns – 181 ns) | 42.3 ns (41.7 ns – 43.1 ns) | 4.24× |
+| char_non_ascii/u64_max | 236 ns (209 ns – 243 ns) | 78.8 ns (76.4 ns – 79.5 ns) | 2.99× |
+| string/u64_max | 1.12 µs (1.11 µs – 1.12 µs) | 167 ns (166 ns – 168 ns) | 6.68× |
+| string_delimited/u64_max | 987 ns (975 ns – 1.01 µs) | 216 ns (214 ns – 219 ns) | 4.57× |
+| u8_binary/u64_max | 578 ns (565 ns – 586 ns) | 62.9 ns (62.8 ns – 63.1 ns) | 9.19× |
 

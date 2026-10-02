@@ -31,12 +31,14 @@ jobs:
       - run: cargo test
 
   msrv:
-    name: test (Rust 1.56)
+    # 0.2.0 built on Rust 1.30, so 0.2.x must too.  Only the library is built:
+    # the tests use newer conveniences.
+    name: build (Rust 1.30)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.56.0
-      - run: cargo test
+      - uses: dtolnay/rust-toolchain@1.30.0
+      - run: cargo build
 
   lint:
     runs-on: ubuntu-latest

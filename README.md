@@ -64,8 +64,8 @@ choose your optional delimiter.  With a delimiter, `gen` follows every unit with
 `"bb::bb::aa"` reads the same as `"bb:bb:aa:"`.
 
 Repeated units are ignored after their first occurrence, so `"0011"` describes binary.  A base
-needs at least 2 distinct units: at most 255 for `char` and `String`, and up to all 256 bytes
-for `u8`.
+takes at least 2 units, and at most 255 distinct ones for `char` and `String` (all 256 bytes
+for `u8`).
 
 ### Looking up units and handling bad input
 

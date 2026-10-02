@@ -1,3 +1,5 @@
+extern crate base_custom;
+
 // Randomised round trips across bases and unit types, checked against the
 // standard library's own radix formatting where it applies.
 use base_custom::{BaseCustom, DecimalError};

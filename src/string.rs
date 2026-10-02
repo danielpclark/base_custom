@@ -13,7 +13,10 @@ impl BaseCustom<String> {
   /// if the delimiter is partitioning the string in such a way.
   ///
   /// Empty units are skipped and repeated units are ignored after their first
-  /// occurrence.  This panics unless 2 to 255 distinct units remain.
+  /// occurrence.  This panics with fewer than 2 units or more than 255 distinct
+  /// ones.  As in 0.2.0, repeats count towards the minimum when there is a
+  /// delimiter, so `"x x"` with `Some(' ')` makes a base of one unit: it can
+  /// only read and write zero, and `gen` panics for any other value.
   pub fn new<S>(chars: S, delim: Option<char>) -> BaseCustom<String>
   where
     S: Into<String>,
@@ -25,10 +28,13 @@ impl BaseCustom<String> {
         .filter(|s| !s.is_empty())
         .map(String::from)
         .collect(),
-      None => chars.chars().map(String::from).collect(),
+      None => chars.chars().map(|c| c.to_string()).collect(),
     };
+    let given = units.len();
     let (units, mapped) = index_units(units);
-    check_unit_count(units.len(), 255);
+    // 0.2.0 removed repeats before counting only when there was no delimiter.
+    let given = if delim.is_some() { given } else { units.len() };
+    check_unit_count(given, units.len(), 255);
     BaseCustom::<String> {
       base: units.len() as u64,
       primitives: units,
@@ -155,7 +161,7 @@ impl BaseCustom<String> {
   }
 
   fn position_u8(&self, unit: &str) -> Option<u8> {
-    self.primitives_hash.get(unit).copied()
+    self.primitives_hash.get(unit).cloned()
   }
 
   /// Returns the zero value of your custom base

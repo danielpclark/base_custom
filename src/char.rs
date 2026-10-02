@@ -13,10 +13,14 @@ impl BaseCustom<char> {
   /// for measuring the custom numeric base will only be one character long each.
   ///
   /// Repeated characters are ignored after their first occurrence.  This panics
-  /// unless 2 to 255 distinct characters remain.
+  /// if given fewer than 2 characters or more than 255 distinct ones.  As in
+  /// 0.2.0, repeats count towards the minimum, so `vec!['a', 'a']` makes a base
+  /// of one unit: it can only read and write zero, and `gen` panics for any
+  /// other value.
   pub fn new(chars: Vec<char>) -> BaseCustom<char> {
+    let given = chars.len();
     let (chars, mapped) = index_units(chars);
-    check_unit_count(chars.len(), 255);
+    check_unit_count(given, chars.len(), 255);
     let table = small_table(
       chars
         .iter()
@@ -76,7 +80,7 @@ impl BaseCustom<char> {
   /// '9'
   /// ```
   pub fn char(&self, input_val: usize) -> Option<char> {
-    self.primitives.get(input_val).copied()
+    self.primitives.get(input_val).cloned()
   }
 
   /// `decimal` returns a u64 value on computed from the units that form
@@ -144,7 +148,7 @@ impl BaseCustom<char> {
   fn position_u8(&self, unit: char) -> Option<u8> {
     match self.table.get(unit as usize) {
       Some(&place) => place,
-      None => self.primitives_hash.get(&unit).copied(),
+      None => self.primitives_hash.get(&unit).cloned(),
     }
   }
 

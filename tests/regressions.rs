@@ -1,23 +1,48 @@
+extern crate base_custom;
+
 // Regression tests for bugs fixed in 0.2.1.  Each failed (or hung) on 0.2.0.
 use base_custom::{BaseCustom, DecimalError};
 
 #[test]
-#[should_panic(expected = "Too few numeric units! Provide two or more.")]
-fn char_duplicates_cannot_leave_a_single_unit() {
-  // 0.2.0 built a base of size 1 whose `gen` looped forever.
-  BaseCustom::<char>::new(vec!['a', 'a']);
+fn one_unit_bases_still_build_and_gen_no_longer_hangs() {
+  // As in 0.2.0, repeats count towards the two-unit minimum, so these build.
+  let chars = BaseCustom::<char>::new(vec!['a', 'a']);
+  let bytes = BaseCustom::<u8>::new(&[1, 1]);
+  let strings = BaseCustom::<String>::new("x x x", Some(' '));
+  assert_eq!((chars.base, bytes.base, strings.base), (1, 1, 1));
+  // Reading and writing zero work, as before.
+  assert_eq!(chars.decimal("aaa"), 0);
+  assert_eq!(bytes.decimal(&[1, 1]), 0);
+  assert_eq!(strings.decimal("x x"), 0);
+  assert_eq!(chars.gen(0), "a");
+  assert_eq!(bytes.gen(0), vec![1]);
+  assert_eq!(strings.gen(0), "x");
+}
+
+#[test]
+#[should_panic(expected = "1 cannot be written in a base of a single unit")]
+fn one_unit_char_gen_panics_instead_of_hanging() {
+  // 0.2.0 looped forever, growing its output until memory ran out
+  BaseCustom::<char>::new(vec!['a', 'a']).gen(1);
+}
+
+#[test]
+#[should_panic(expected = "cannot be written in a base of a single unit")]
+fn one_unit_u8_gen_panics_instead_of_hanging() {
+  BaseCustom::<u8>::new(&[1, 1]).gen(5);
 }
 
 #[test]
 #[should_panic(expected = "Too few numeric units! Provide two or more.")]
-fn u8_duplicates_cannot_leave_a_single_unit() {
-  BaseCustom::<u8>::new(&[1, 1]);
+fn fewer_than_two_units_still_panics() {
+  BaseCustom::<char>::new(vec!['a']);
 }
 
 #[test]
 #[should_panic(expected = "Too few numeric units! Provide two or more.")]
-fn string_duplicates_cannot_leave_a_single_unit() {
-  BaseCustom::<String>::new("x x x", Some(' '));
+fn undelimited_string_repeats_still_count_once() {
+  // 0.2.0 removed repeats before counting when there was no delimiter
+  BaseCustom::<String>::new("aa", None);
 }
 
 #[test]

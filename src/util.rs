@@ -64,12 +64,15 @@ pub fn index_units<T: Clone + Eq + Hash>(units: Vec<T>) -> (Vec<T>, UnitMap<T>) 
   (unique, positions)
 }
 
-/// Panics unless the number of units is usable (`max` inclusive).
-pub fn check_unit_count(count: usize, max: usize) {
-  if count < 2 {
+/// Panics unless a base is usable.  `given` counts units the way 0.2.0 did,
+/// which is before repeats are removed for `char`, `u8` and delimited
+/// `String` bases, so a list of repeats such as `['a', 'a']` still builds a
+/// (one-unit) base as it always has.  `distinct` counts units without repeats.
+pub fn check_unit_count(given: usize, distinct: usize, max: usize) {
+  if given < 2 {
     panic!("Too few numeric units! Provide two or more.")
   }
-  if count > max {
+  if distinct > max {
     panic!("Too many numeric units!")
   }
 }
@@ -91,6 +94,11 @@ pub fn small_table(entries: impl Iterator<Item = (usize, u8)>, size: usize) -> V
 /// has at most 64 places (in binary), and every place fits in a u8 because a
 /// base has at most 256 units.
 pub fn fill_places(mut value: u64, base: u64, buf: &mut [u8; 64]) -> &[u8] {
+  // A base whose units were all repeats of one unit can only write zero;
+  // 0.2.0 looped forever here.
+  if base == 1 && value != 0 {
+    panic!("{} cannot be written in a base of a single unit", value)
+  }
   let mut start = buf.len();
   loop {
     start -= 1;

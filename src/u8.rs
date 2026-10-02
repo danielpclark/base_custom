@@ -11,11 +11,14 @@ impl BaseCustom<u8> {
   /// `new` for `BaseCustom<u8>` requires a `&[u8]` as its parameters and units
   /// for measuring the custom numeric base will only be one u8 long each.
   ///
-  /// Repeated bytes are ignored after their first occurrence.  This panics
-  /// unless at least 2 distinct bytes remain.
+  /// Repeated bytes are ignored after their first occurrence.  This panics if
+  /// given fewer than 2 bytes.  As in 0.2.0, repeats count towards the
+  /// minimum, so `&[1, 1]` makes a base of one unit: it can only read and
+  /// write zero, and `gen` panics for any other value.
   pub fn new(bytes: &[u8]) -> BaseCustom<u8> {
+    let given = bytes.len();
     let (bytes, mapped) = index_units(bytes.to_vec());
-    check_unit_count(bytes.len(), 256);
+    check_unit_count(given, bytes.len(), 256);
     let table = small_table(
       bytes
         .iter()
@@ -124,7 +127,7 @@ impl BaseCustom<u8> {
   /// Like most indexing operations, the count starts from zero, so nth(0) returns the first value,
   /// nth(1) the second, and so on.
   pub fn nth(&self, pos: usize) -> Option<u8> {
-    self.primitives.get(pos).copied()
+    self.primitives.get(pos).cloned()
   }
 }
 

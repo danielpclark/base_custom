@@ -1,7 +1,7 @@
 # base_custom
-[![Build Status](https://travis-ci.org/danielpclark/base_custom.svg?branch=master)](https://travis-ci.org/danielpclark/base_custom)
+[![CI](https://github.com/danielpclark/base_custom/actions/workflows/ci.yml/badge.svg)](https://github.com/danielpclark/base_custom/actions/workflows/ci.yml)
 [![crates.io version](https://img.shields.io/crates/v/base_custom.svg)](https://crates.io/crates/base_custom)
-[![License](https://img.shields.io/crates/l/base_custom.svg)]()
+[![Documentation](https://docs.rs/base_custom/badge.svg)](https://docs.rs/base_custom)
 
 Use any characters as your own numeric base and convert to and from decimal.  This can be taken advantage of in various ways:
 
@@ -13,26 +13,28 @@ Use any characters as your own numeric base and convert to and from decimal.  Th
 
 _There is also a Ruby and Crystal implementation of this which this was based off of._
 
+For numbers beyond `u64`, with arithmetic on them, see [digits](https://github.com/danielpclark/digits),
+which is built on this crate.
+
 ### Installation
 
 Add the following to your Cargo.toml file
 ```toml
 [dependencies]
-base_custom = "^0.2"
+base_custom = "0.2"
 ```
 
-To include it for usage add
+and bring it into scope with
 
 ```rust
-extern crate base_custom;
 use base_custom::BaseCustom;
 ```
-
-to your file.
 
 ### Usage
 
 ```rust
+use base_custom::BaseCustom;
+
 // Binary with no delimiter
 let base2 = BaseCustom::<char>::new("01".chars().collect());
 assert_eq!(base2.decimal("00001"), 1_u64);
@@ -50,22 +52,54 @@ assert_eq!(base3.gen(123), "BBBCA");
 let base_music = BaseCustom::<String>::new("A A# B C C# D D# E F F# G G#", Some(' '));
 assert_eq!(base_music.decimal("F F# B D# D A# D# F# "), 314159265);
 assert_eq!(base_music.gen(314159265), "F F# B D# D A# D# F# ");
+
+// Bytes work too
+let base_bytes = BaseCustom::<u8>::new(b"01");
+assert_eq!(base_bytes.gen(5), b"101");
 ```
 
 When using `BaseCustom::<String>::new` the second parameter must be of `Option<char>` to
-choose your optional delimiter.
+choose your optional delimiter.  With a delimiter, `gen` follows every unit with the delimiter
+(except for zero, which is the zero unit alone) and `decimal` skips empty units, so
+`"bb::bb::aa"` reads the same as `"bb:bb:aa:"`.
+
+Repeated units are ignored after their first occurrence, so `"0011"` describes binary.  A base
+needs at least 2 distinct units: at most 255 for `char` and `String`, and up to all 256 bytes
+for `u8`.
+
+### Looking up units and handling bad input
+
+`decimal` panics on a unit that is not in the base or a value larger than `u64::MAX`.  Use
+`try_decimal` to get an error instead, and `position` to look up a single unit (the reverse of
+`nth`).
+
+```rust
+use base_custom::{BaseCustom, DecimalError};
+
+let hex = BaseCustom::<char>::new("0123456789abcdef".chars().collect());
+assert_eq!(hex.position('a'), Some(10));
+assert_eq!(hex.nth(10), Some(&'a'));
+assert_eq!(hex.position('g'), None);
+
+assert_eq!(hex.try_decimal("ff"), Ok(255));
+assert_eq!(hex.try_decimal("fg"), Err(DecimalError::UnknownUnit { position: 1 }));
+assert_eq!(hex.try_decimal("1".repeat(17)), Err(DecimalError::Overflow));
+```
+
+`BaseCustom` is `Send + Sync`, so one base can be shared between threads.
 
 ### Benchmarks
 
-Benchmarks are provided for the various usages and implementations. `BaseCustom<char>` is
-by far the most efficient implementation.
+The [`benchmarks`](benchmarks) directory compares this version with the previous release using
+Criterion; see [`benchmarks/RESULTS.md`](benchmarks/RESULTS.md).  `BaseCustom<char>` and
+`BaseCustom<u8>` are the fastest implementations.
 
 ## License
 
 Licensed under either of
 
- * Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
- * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+ * Apache License, Version 2.0, (http://www.apache.org/licenses/LICENSE-2.0)
+ * MIT license ([MIT-LICENSE](MIT-LICENSE) or http://opensource.org/licenses/MIT)
 
 at your option.
 

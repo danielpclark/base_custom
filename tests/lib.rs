@@ -114,6 +114,14 @@ mod char {
   }
 
   #[test]
+  fn char_should_return_none_for_out_of_bounds() {
+    let base3 = BaseCustom::<char>::new("ABC".chars().collect());
+    assert_eq!(base3.char(2), Some('C'));
+    assert_eq!(base3.char(3), None);
+    assert_eq!(base3.char(12), None);
+  }
+
+  #[test]
   fn it_shows_zero_one_and_nth() {
     let base3 = BaseCustom::<char>::new("ABC".chars().collect());
     assert_eq!(base3.zero(), &'A');

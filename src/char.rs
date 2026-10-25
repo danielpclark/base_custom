@@ -75,7 +75,7 @@ impl BaseCustom<char> {
   /// '9'
   /// ```
   pub fn char(&self, input_val: usize) -> Option<char> {
-    if input_val > self.primitives.len() { return None }
+    if input_val >= self.primitives.len() { return None }
     Some(self.primitives[input_val])
   }
 

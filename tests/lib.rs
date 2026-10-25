@@ -234,6 +234,12 @@ mod string {
   }
 
   #[test]
+  fn nth_should_return_zero_for_zero() {
+    let base3 = BaseCustom::<String>::new("ABC", None);
+    assert_eq!(base3.nth(0), Some("A"));
+  }
+
+  #[test]
   fn it_shows_zero_one_and_nth() {
     let base3 = BaseCustom::<String>::new("ABC", None);
     assert_eq!(base3.zero(), "A");

@@ -112,7 +112,7 @@ impl BaseCustom<String> {
   /// Like most indexing operations, the count starts from zero, so nth(0) returns the first value,
   /// nth(1) the second, and so on.
   pub fn nth(&self, pos: usize) -> Option<&str> {
-    if pos > 0 && pos < self.base as usize {
+    if pos < self.base as usize {
       Some(&self.primitives[pos])
     } else {
       None

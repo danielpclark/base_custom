@@ -89,6 +89,23 @@ mod u8 {
     let base3f = BaseCustom::<u8>::new(b"BCA");
     assert_eq!(base3e == base3f, false);
   }
+
+  #[test]
+  fn try_decimal_handles_unknown_units_and_overflow() {
+    let base2 = BaseCustom::<u8>::new(b"01");
+    assert_eq!(base2.try_decimal(b"00011"), Some(3));
+    assert_eq!(base2.try_decimal(b"0102"), None);
+    assert_eq!(base2.try_decimal(&[b'1'; 64][..]), Some(u64::max_value()));
+    assert_eq!(base2.try_decimal(&[b'1'; 65][..]), None);
+  }
+
+  #[test]
+  #[should_panic(expected = "is not part of this numeric base")]
+  fn decimal_panics_descriptively_for_unknown_units() {
+    let base2 = BaseCustom::<u8>::new(b"01");
+    base2.decimal(b"0102");
+  }
+
 }
 
 #[cfg(test)]
@@ -215,6 +232,23 @@ mod char {
     assert_eq!(base10.base, 10);
     assert_eq!(base10.char((base10.base - 1) as usize), Some('9'));
   }
+
+  #[test]
+  fn try_decimal_handles_unknown_units_and_overflow() {
+    let base2 = BaseCustom::<char>::new("01".chars().collect());
+    assert_eq!(base2.try_decimal("00011"), Some(3));
+    assert_eq!(base2.try_decimal("0102"), None);
+    assert_eq!(base2.try_decimal("1".repeat(64)), Some(u64::max_value()));
+    assert_eq!(base2.try_decimal("1".repeat(65)), None);
+  }
+
+  #[test]
+  #[should_panic(expected = "is not part of this numeric base")]
+  fn decimal_panics_descriptively_for_unknown_units() {
+    let base2 = BaseCustom::<char>::new("01".chars().collect());
+    base2.decimal("0102");
+  }
+
 }
 
 #[cfg(test)]
@@ -320,4 +354,24 @@ mod string {
     let base3h = BaseCustom::<String>::new("BCA", None);
     assert_eq!(base3g == base3h, false);
   }
+
+  #[test]
+  fn try_decimal_handles_unknown_units_and_overflow() {
+    let base2 = BaseCustom::<String>::new("01", None);
+    assert_eq!(base2.try_decimal("00011"), Some(3));
+    assert_eq!(base2.try_decimal("0102"), None);
+    assert_eq!(base2.try_decimal("1".repeat(64)), Some(u64::max_value()));
+    assert_eq!(base2.try_decimal("1".repeat(65)), None);
+    let words = BaseCustom::<String>::new("zero:one", Some(':'));
+    assert_eq!(words.try_decimal("one:one"), Some(3));
+    assert_eq!(words.try_decimal("one:two"), None);
+  }
+
+  #[test]
+  #[should_panic(expected = "is not part of this numeric base")]
+  fn decimal_panics_descriptively_for_unknown_units() {
+    let base2 = BaseCustom::<String>::new("01", None);
+    base2.decimal("0102");
+  }
+
 }

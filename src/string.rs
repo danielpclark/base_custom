@@ -92,9 +92,43 @@ impl BaseCustom<String> {
       None => input_val.chars().map(|c| format!("{}", c)).collect(),
     };
 
+    for chr in &strings {
+      if !self.primitives_hash.contains_key(&chr[..]) {
+        panic!("Unit {:?} is not part of this numeric base ({:?})", chr, self.primitives);
+      }
+    }
+
     strings.iter().rev().enumerate().fold(0, |sum, (i, chr)|
       sum + (self.primitives_hash[&chr[..]] as u64) * self.base.pow(i as u32)
     )
+  }
+
+  /// `try_decimal` is the non-panicking form of `decimal`.  It returns `None`
+  /// when the input contains a unit that is not part of this numeric base,
+  /// or when the value does not fit in a `u64`.
+  ///
+  /// # Example
+  /// ```
+  /// use base_custom::BaseCustom;
+  ///
+  /// let base2 = BaseCustom::<String>::new("01", None);
+  /// assert_eq!(base2.try_decimal("00011"), Some(3));
+  /// assert_eq!(base2.try_decimal("0102"), None);
+  /// ```
+  pub fn try_decimal<S>(&self, input_val: S) -> Option<u64>
+    where S: Into<String> {
+    let input_val = input_val.into();
+    let strings: Vec<String> = match self.delim {
+      Some(c) => input_val.split(c).filter(|c| !c.is_empty()).map(|c| format!("{}", c)).collect(),
+      None => input_val.chars().map(|c| format!("{}", c)).collect(),
+    };
+    let mut sum: u64 = 0;
+    for (i, chr) in strings.iter().rev().enumerate() {
+      let unit = *self.primitives_hash.get(&chr[..])? as u64;
+      let place = self.base.checked_pow(i as u32)?;
+      sum = sum.checked_add(unit.checked_mul(place)?)?;
+    }
+    Some(sum)
   }
 
   /// Returns the zero value of your custom base

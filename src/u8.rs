@@ -74,9 +74,37 @@ impl BaseCustom<u8> {
   /// 3
   /// ```
   pub fn decimal(&self, input_val: &[u8]) -> u64 {
+    for byt in input_val {
+      if !self.primitives_hash.contains_key(byt) {
+        panic!("Unit {:?} is not part of this numeric base ({:?})", byt, self.primitives);
+      }
+    }
+
     input_val.iter().rev().enumerate().fold(0, |sum, (i, byt)|
       sum + (self.primitives_hash[&byt] as u64) * self.base.pow(i as u32)
     )
+  }
+
+  /// `try_decimal` is the non-panicking form of `decimal`.  It returns `None`
+  /// when the input contains a byte that is not part of this numeric base,
+  /// or when the value does not fit in a `u64`.
+  ///
+  /// # Example
+  /// ```
+  /// use base_custom::BaseCustom;
+  ///
+  /// let base2 = BaseCustom::<u8>::new(b"01");
+  /// assert_eq!(base2.try_decimal(b"00011"), Some(3));
+  /// assert_eq!(base2.try_decimal(b"0102"), None);
+  /// ```
+  pub fn try_decimal(&self, input_val: &[u8]) -> Option<u64> {
+    let mut sum: u64 = 0;
+    for (i, byt) in input_val.iter().rev().enumerate() {
+      let unit = *self.primitives_hash.get(byt)? as u64;
+      let place = self.base.checked_pow(i as u32)?;
+      sum = sum.checked_add(unit.checked_mul(place)?)?;
+    }
+    Some(sum)
   }
 
   /// Returns the zero value of your custom base
